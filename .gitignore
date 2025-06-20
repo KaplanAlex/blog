@@ -1,0 +1,20 @@
+# Hugo cache
+/resources/_gen/
+/hugo_stats.json
+
+# Hugo build output (only ignore if you use `public/`)
+/public/
+
+# Themes
+/themes/
+
+# Node modules if used
+node_modules/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+
+# Node modules if used
+node_modules/
