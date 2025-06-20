@@ -1,6 +1,6 @@
 baseURL = 'https://kaplanalex.github.io/blog/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = "Alex's blog"
 theme = "PaperMod"
 
 [caches]
