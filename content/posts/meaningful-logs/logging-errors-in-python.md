@@ -6,12 +6,14 @@ series = ["Meaningful Logs"]
 tags = ["logging", "development"]
 weight = 5
 +++
-In the [previous article](TODO link), we explored the many challenges of logging errors—how to capture them effectively, group them meaningfully, and support fast debugging.
+_Part 5 of 5 in the series [Meaningful Logs]({{< ref "/series/meaningful-logs" >}})_
+
+In the [previous article]({{< ref "logging-errors" >}}), we explored the many challenges of logging errors—how to capture them effectively, group them meaningfully, and support fast debugging.
 
 This article grounds that discussion in practical examples and utilities that can be used as the foundation for robust error logging in Python. We'll cover:
 
 - A pattern for structured logging in Python that satisfies all three requirements.
-- Direct integration with `structlog` and  [Sentry](https://sentry.io/).
+- Direct integration with `structlog` and [Sentry](https://sentry.io/).
 - Logging examples
 
 # Custom Python Exceptions
@@ -30,7 +32,7 @@ In discussing these requirements we found that much of meeting them comes down t
 
 However as you may have noticed in some of the previous examples, there are still a few points of friction in exception logging. To solve this, we'll design a small abstraction that simplifies structured error logging and standardizes how context is captured and surfaced.
 
-To begin, let's revisit the code from the *Accommodate Exceptions* section of the last post. It successfully captures context (`user_id`) but doing so required manual plumbing:
+To begin, let's revisit the code from the [*Accommodate Exceptions*]({{<ref "logging-errors#accommodate-exceptions">}}) section of the last post. It successfully captures context (`user_id`) but doing so required manual plumbing:
 
 ```python
 # my_package.__init__ configures a logger as described in the last section.
@@ -80,7 +82,7 @@ While this pattern works for this use case, there is a strong coupling between t
 
 ## Exception Base Class
 
-To standardize this pattern and hide complexity during day-to-day development we can define a custom base exception class - `CustomException`. This class will:
+To standardize this pattern and hide complexity during day-to-day development we can define a custom base exception class `CustomException`. This class will:
 
 - Standardize how context is stored and accessed
 - Enable automatic context propagation through exception chains
@@ -119,24 +121,24 @@ class CustomException(Exception):
 
 This utility gives us a clean, composable way to attach and collect structured fields associated with any error. When paired with a logging wrapper, we can automatically extract this context and emit it with our log.
 
-## **Usage Guidelines**
+## Usage Guidelines
 
 Use `CustomException` as the base class for any error you plan to send to aggregators or include in structured logs.
 
-### **Key Features**
+### Key Features
 
 - **message** *(optional)*: A human-readable description of the specific failure
 - **ctx** *(optional)*: A dictionary of metadata to attach to the log or error report
 - **Chaining support**: When exceptions are chained, context from the full chain is preserved via get_context_chain()
 
-### **Best Practices**
+### Best Practices
 
 - **Subclass** `CustomException` for each meaningful error type
 - Give each class a stable, descriptive name that reflects the root cause (e.g. `UserFetchError`, `InvalidRequestError`)
 - Reuse these classes across your codebase for consistent grouping and easier triage
 - Use `ctx` to attach all relevant metadata—e.g., `request_id`, `user_id`, environment state, etc.
 
-### **Example**
+### Example
 
 ```python
 # Exception class
@@ -204,7 +206,7 @@ def process_custom_exceptions(_logger: WrappedLogger, _method_name: str, event_d
 
 This processor can be added to a `structlog` processor chain to automatically enrich logs whenever an exception is passed via the `err` keyword.
 
-**Example — Even Simpler**
+#### Example — Even Simpler
 
 ```python
 # Exception class

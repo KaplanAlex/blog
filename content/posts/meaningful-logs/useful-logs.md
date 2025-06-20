@@ -6,6 +6,7 @@ series = ["Meaningful Logs"]
 tags = ["logging", "development"]
 weight = 1
 +++
+_Part 1 of 5 in the series [Meaningful Logs]({{< ref "/series/meaningful-logs" >}})_
 
 From printing `"hello world"` to debugging your first program, nearly everyone starts their coding journey with a log statement.
 
@@ -47,7 +48,7 @@ If you have ever owned an application which wrote directly to a log file on a ma
 
 These systems are most useful when the ingested logs are ***structured*** meaning they contain key-value pairs which can be used to index messages. It's also generally useful to include ***metadata*** (e.g. `environment`, `session_id`) within logs to facilitate searches and the construction of dashboards based on log content.
 
-The next article in this series will cover structured logging in detail.
+The {{< ref "structured-log-primer" >}} will cover structured logging in detail.
 
 ### Useful practices
 
@@ -70,7 +71,7 @@ When building tools used directly by humans the ***emphasis of logs should be on
 
 In many cases ***structured*** logs can be formatted in a way that is still human readable and generally more actionable than a sentence. For example this structured log is easier to interpret and reference as needed (for example to find `workflow_id`) than a sentence with the same information.
 
-```
+```jsx
 {
   "event": "Calculation succeeded",
   "workflow_id": "64aef9ca51b691ce2d32a6cc",
@@ -80,7 +81,7 @@ In many cases ***structured*** logs can be formatted in a way that is still huma
 
 vs
 
-```
+```bash
 "Calculation succeeded for workflow with id 64aef9ca51b691ce2d32a6cc in task 64aefa0455e6c5d7a1263d5e"
 ```
 
@@ -102,8 +103,8 @@ Error logging comes with a whole suite of extra challenges. At its core logging 
 
 The structured logging pattern is an ideal method for building the context associated with the event. However in most cases error logs are the log form of an exception raised during a program. Exceptions serve a dual purpose of providing context on an unexpected state and exiting the control flow of a program. Logging errors appropriately requires accommodating both purposes while maintaining the ability to include structured information describing the environment at the time of the exception.
 
-Errors will be covered in a dedicated article toward the end of the series where I'll motivate and introduce a custom exception library.
+Errors will be covered in [a later article]({{< ref "logging-errors" >}}) where I'll motivate and introduce a custom exception library.
 
 ## Onward!
 
-With the motivation out of the way, join me in the next article where I dig deeper into best practices and use cases for structured logs
+With the motivation out of the way, join me in the [next article]({{< ref "structured-log-primer" >}}) where I dig deeper into best practices and use cases for structured logs

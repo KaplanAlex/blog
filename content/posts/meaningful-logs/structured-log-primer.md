@@ -2,15 +2,15 @@
 date = '2025-06-20T14:44:40-07:00'
 draft = false
 title = 'Structured Log Primer'
+description = "Background and best practices for structured logging."
 series = ["Meaningful Logs"]
 tags = ["logging", "development"]
 weight = 2
 +++
-Background and best practices for structured logging.
+_Part 2 of 5 in the series [Meaningful Logs]({{< ref "/series/meaningful-logs" >}})_
 
 # Context
-
-Structured logging is the practice of attaching key value pairs to event logs for the purpose of simplifying log search and consumption. For more motivating details see the first article in the series Useful Logs.
+Structured logging is the practice of attaching key value pairs to event logs for the purpose of simplifying log search and consumption. For more motivating details see the first article in the series [Useful Logs]({{< ref "useful-logs">}}).
 
 # Anatomy
 
@@ -30,24 +30,24 @@ Structured logs can be thought of as dictionaries with a dedicated field holding
 
 While the format may be simple, effectively utilizing structured logging at a company or even project level is nuanced. Below are a few patterns to keep in mind as you get started.
 
-1. Use consistent key names
-2. Build your log context
-3. Use descriptive names which are likely to be unique
-4. Use primitive values for search fields
+1. [Use consistent key names]({{<ref "#consistent-key-names">}})
+2. [Build your log context]({{<ref "#build-your-log-context">}})
+3. [Use descriptive names which are likely to be unique]({{<ref "#use-descriptive-names">}})
+4. [Use primitive values for search fields]({{<ref "#use-primitive-values-for-search-fields">}})
 
-## **Consistent key names**
+## Consistent key names
 
 The primary benefit of structured logs is that they're searchable by the included fields. The simple task of searching by an indexed field becomes complex if the field you're interested in is captured across a variety of different keys.
 
 Imagine the `id` of a session is attached to logs under several names: `id`, `session_id`, `sid`, and `s_uid`. Anyone who wants to query for all logs related to the session will need to both be aware of all variations of the field name and match each variation in their query. This process is both cumbersome and error prone.
 
-### **How to**
+### How to
 
-Constants
+#### Constants
 
 The best way to enforce consistent fields names is to define a constant holding the key. Use this constant every time you log.
 
-Example using Python `structlog` (later articles in the series will dig deeper into this library):
+Example using Python [`structlog`](https://www.structlog.org/en/stable/) (a later [article]({{< ref "structured-logging-in-python" >}}) will dig deeper into this library):
 
 ```python
 import structlog
@@ -66,7 +66,7 @@ Output
 
 ## Build your log context
 
-Many structured logging libraries have utilities for building a running set of structured fields over the course of a process. This set of fields is generally knowns as the "log context" and can be attached automatically to future log lines.
+Many structured logging libraries have utilities for building a running set of structured fields over the course of a process. This set of fields is commonly knowns as the "log context" and can be attached automatically to future log lines.
 
 Use these methods to set fields relevant to downstream logs as soon as they're available. This will both cut down on the potential for variability in key names and reduce the possibility of forgetting to attach keys to downstream logs.
 
@@ -74,9 +74,9 @@ Use these methods to set fields relevant to downstream logs as soon as they're a
 
 When working with loggers you're likely to find yourself working with both `mutable` and `immutable` context. Each type has its merits as both are well suited to specific logging patterns and scenarios. You'll become familiar with both patterns throughout the series. For now, just know know that sometimes you'll make a copy of your context and other times you'll modify shared state.
 
-Add to an immutable context
+#### Add to an immutable context
 
-**Outcome:** New fields are only made available to downstream calls. 
+**Outcome**: New fields are only made available to downstream calls.
 
 As the original context is immutable "adding to the context" actually results in making a copy of the original context and including the new field. Use this style of logging when:
 
@@ -119,9 +119,9 @@ Output
 2025-03-01T19:42:22.001139Z [Info    ] completed processing            service_name="user_store"
 ```
 
-Add to a mutable context
+#### Add to a mutable context
 
-**Outcome:** New fields are made available to all calls for the remaining lifetime of the process.
+**Outcome**: New fields are made available to all calls for the remaining lifetime of the process.
 
 When this pattern is used, additions to the context are made available to all downstream and upstream logs.
 
@@ -158,17 +158,17 @@ Output
 2024-04-01T19:42:22.001139Z [Info    ] completed processing            service_name="user_store" user_name="Joe"
 ```
 
-Use middleware
+#### Use middleware
 
 It's common for logging libraries to send logs through a chain of processing methods after the log call is executed. These processors are responsible for transforming the log context and message into a well formatted output. This processing step is a great place to automate the addition of common metadata fields to every log. Nearly every logging config you'll see in a production code base will include the addition of log `level` and `timestamp`.
 
 In all of the output examples above both `level` and `timestamp` were included through a processor. We'll get into the processor chain and writing custom processors later in the series. For now know the pattern exists and is the suggested option for adding default fields to every log line.
 
-## **Use descriptive names**
+## Use descriptive names
 
 Logger contexts have a large scope. They may even span multiple libraries. The chance of collision between keys with simple names is high in complex ecosystems. In many libraries key collisions are handled by silently overwriting the previous key value making it difficult to know they occur. When keys collide context is lost as a context value is dropped and log trails get interrupted.
 
-Anti-pattern example:
+**Anti-pattern example**
 
 ```python
 """
@@ -209,17 +209,17 @@ Output
 
 ### How to
 
-Be descriptive
+#### Be descriptive
 
 As a best practice make key names as descriptive as possible. Using the example above `session_id` and `user_id` would make better key names. In small systems descriptive names alone may be sufficient to avoid collisions. 
 
-Prefix keys with a package identifier
+#### Prefix keys with a package identifier
 
 In larger ecosystems it's useful to establish a pattern of prefixing keys with a service or package identifier on top of using descriptive key names. Descriptive key names prevent conflicts within the service while the identifier guarantees global uniqueness.
 
 It's common either add prefixes directly to the key constant name or to automate the addition through middleware.
 
-Example
+**Example**
 
 ```python
 # service 1
@@ -245,7 +245,9 @@ This point is especially important when considering variables which appear to ho
 
 ### How to
 
-Test your logs during development
+#### Test your logs during development
 
 - Run your code and inspect important logs. Make sure structured fields appear as you expect them to.
 - Add tests verifying log emission and context. We'll cover log testing strategies in a future article
+
+→ *Join me in the [next post]({{< ref "structured-logging-in-python">}}) for practical guidance on logging in Python!*

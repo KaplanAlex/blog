@@ -2,11 +2,12 @@
 date = '2025-06-20T14:46:03-07:00'
 draft = false
 title = 'Structured Logging in Python'
+description = 'Kicking off our Journey into Python structured logs'
 series = ["Meaningful Logs"]
 tags = ["logging", "development"]
 weight = 3
 +++
-*Kicking off our Journey into Python structured logs*
+_Part 3 of 5 in the series [Meaningful Logs]({{< ref "/series/meaningful-logs" >}})_
 
 Now that we're fully motivated to structure all of our logs we can dive into the specifics of structured logging through examples. 
 
@@ -29,9 +30,9 @@ The `structlog` [documentation](https://www.structlog.org/en/stable/) is awesome
 
 # `structlog` concepts
 
-- BoundLogger
-- Context
-- Processors
+- [BoundLogger]({{<ref "#boundlogger">}})
+- [Context]({{<ref "#context">}})
+- [Processors]({{<ref "#processors">}})
 
 ### BoundLogger
 
@@ -102,9 +103,9 @@ Simply add this method to the appropriate place in the list of processors and yo
 
 With that background out of the way, let's dive into a few conventions I've found useful when logging. They are:
 
-1. Use a dedicated class to manage log configuration.
-2. Use a combination of logger access methods as appropriate.
-3. Build your log context
+1. [Use a dedicated class to manage log configuration]({{<ref "#use-a-dedicated-log-configuration-class">}})
+2. [Use a combination of logger access methods as appropriate]({{<ref "#use-a-combination-of-logger-access-methods">}})
+3. [Build your log context]({{<ref "#build-your-log-context">}})
 
 The following sections cover these conventions in detail, grounding the conversation in tangible examples.
 
@@ -298,7 +299,7 @@ Now that your logger is initialized, the next challenge is making it accessible 
 
 Dependency injection is one of my favorite software engineering principles. It's a simple concept that limits the scope of software, making it easier to reason about. If you're unfamiliar, *injection* just means passing dependencies as explicit inputs rather than having components reach out to the global context.
 
-**Quick Injection example: passing a database client**
+#### Quick Injection example: passing a database client
 
 Suppose you have a class that manages the execution of a job. Rather than initializing a database client inside the class you pass it in:
 
@@ -321,7 +322,7 @@ def test_runner_db_call():
     mock_db_client.select_lots_of_data.assert_called_once()
 ```
 
-**Injecting loggers**
+#### Injecting loggers
 
 Loggers can be injected in the same way. The benefits are similar:
 
@@ -361,7 +362,7 @@ The second common pattern is to pull a logger from the global scope. In general,
 
 In Python in particular, the use of "module level loggers" is widespread. It's common to configure a logger once at package initialization in the top-level `__init__.py`  and import it wherever it's needed.
 
-**Example: package-wide logger**
+#### Example: package-wide logger
 
 ```python
 # my_package/__init__.py
@@ -386,7 +387,7 @@ def match_name(raw: str):
     # ...
 ```
 
-**Benefits of this approach**
+Benefits of this approach:
 
 - **Simplifies usage**: The logger is directly accessible everywhere in the module. Any code path is free to log.
 - **Ensures consistency**: All log statements share the same processors, format, and base context (e.g., `package="my-package"`).
@@ -406,11 +407,11 @@ Most packages will work fine with either approach. My advice is to:
 
 There are many patterns for attaching context to logs. Combine these patterns in whatever way best enables you to track to information that matters most when you log.
 
-### **Pattern 1: Bind to a base logger**
+### Pattern 1: Bind to a base logger
 
 As shown throughout the series, context can be set directly on a logger. When working with a base logger—whether it's created during startup or injected into a class—it's a good idea to bind context that won't change throughout the logger's lifetime right away.
 
-**Example: Initialization**
+#### Example: Initialization
 
 ```python
 # Application startup
@@ -474,7 +475,7 @@ Some log libraries support storing context in a dedicated global memory space un
 
 As an example, consider a scenario where you want to log a summary event at the end of a process that includes context fields gathered from the entire process. Aggregating this context across process layers poses a significant challenge.
 
-**Manual Dictionary Maintenance**
+#### Manual Dictionary Maintenance
 
 One option is to leverage Pattern 2 and pass a dictionary with context around everywhere. This is effective but cumbersome.
 
@@ -530,7 +531,7 @@ Output from calling `handle_request("req-123")`
 {"event": "Process summary", "request_id": "req-123", "user_id": "user-456", "another_key": 909}
 ```
 
-**Using thread-local context**
+#### Using thread-local context
 
 Leveraging the thread-local context removes the complexity of passing state around.
 
@@ -576,10 +577,10 @@ Same output from calling `handle_request("req-123")`
 {"event": "finished request", "request_id": "req-123", "user_id": "user-456"}
 ```
 
-### **Pattern 4: Pass context along with errors**
+### Pattern 4: Pass context along with errors
 
 Context is especially valuable when logging exceptions. Lots of information is needed to effectively diagnose the root cause of an exception. Fortunately exceptions are a great vehicle for passing context!
 
 In the next post, we'll cover how to attach context to errors, log them consistently, and propagate metadata across layers.
 
-→ *Join me in the next post to dive into error logging!*
+→ *Join me in the [next post]({{< ref "logging-errors">}}) to dive into error logging!*

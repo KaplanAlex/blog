@@ -2,10 +2,13 @@
 date = '2025-06-20T14:46:17-07:00'
 draft = false
 title = 'Logging Errors'
+description = "What it takes to log errors well"
 series = ["Meaningful Logs"]
 tags = ["logging", "development"]
 weight = 4
 +++
+_Part 4 of 5 in the series [Meaningful Logs]({{< ref "/series/meaningful-logs" >}})_
+
 Error logging is truly hard to get right. Even with the right tools and best practices it still takes conscious effort to construct meaningful errors. 
 
 In this post, I'll dig into why error logging is so difficult and what it takes to do it well. In the next article, I'll walk through how to log errors in Python using a custom exception library.
@@ -121,7 +124,7 @@ This is where **error aggregators** come in. These tools (e.g. [Sentry](https://
 1. **Discovery**: Related error events are intelligently grouped to produce meaningful volume metrics. Events are indexed by all structured fields, enabling search and aggregation by tags like `user_id`, `service`, or `environment`. Most tools integrate directly with alerting platforms so that critical issues surface quickly. It's common to configure integrations to alerting systems based on these aggregated results.
 2. **Root Cause Analysis**: Aggregators provide a detailed, point-in-time snapshot of individual error events—including stack traces, request metadata, environment variables, and all attached structured context.
 
-### **The Core Challenge: Grouping**
+### The Core Challenge: Grouping
 
 Effective integration with an error aggregator comes down to **grouping.** Similar events must be recognized as part of the same issue to take advantage of aggregation and limit noise.
 
@@ -135,7 +138,7 @@ Some suggestions for grouping effectively:
 - Avoid embedding dynamic values in exception messages (e.g. "UserFetchError for user abc123"). These messages are difficult to group meaningfully.
 - Attach all relevant context as **structured fields** instead of embedding them in the error message.
 
-**Example:**
+#### Example
 
 ```python
 class UserFetchError(Exception):
@@ -164,7 +167,7 @@ Good errors are:
 
 As mentioned throughout this series, I strongly recommend using **dedicated error classes** to represent specific failure types. These errors are easier to interpret, easier to search for, and far more effective when integrated with an aggregator.
 
-Example:
+#### Example:
 
 ```python
 class UserNotFoundError(Exception):
@@ -190,21 +193,21 @@ def fetch_user(user_id: str):
 
 Be deliberate when designing debuggable errors. Every time you raise an exception, ask: *Will this be easy to understand later?* With consistent use of clear names and structured context, debugging becomes a traceable, repeatable process.
 
-# **Best practices**
+# Best practices
 
 We've already covered a lot of ground in this article. For convenience, I've laid out a summary of best practices below. Many of these will probably feel natural to you by now after following the principles throughout this series.
 
 ### Summary
 
-- Log **exceptions** at the highest level.
-- Log errors once—if you raise an exception, don't also log it mid-stack.
-- Use predefined names for error types.
-- Keep dynamic values out of error *fingerprints*. Attach them as structured fields instead.
-- Send errors to both a log aggregator and an error aggregator.
-- Don't send errors to aggregators from local systems.
-- Use appropriate log levels (e.g., error vs warning) to guide attention.
+- [Log **exceptions** at the highest level]({{<ref "#log-exceptions-at-the-highest-level">}}).
+- [Log errors once]({{<ref "#log-errors-once">}})—if you raise an exception, don't also log it mid-stack.
+- [Use predefined names for error types]({{<ref "#use-predefined-names-for-error-types">}}).
+- [Keep dynamic values out of error *fingerprints*]({{<ref "#keep-dynamic-values-out-of-error-fingerprints">}}). Attach them as structured fields instead.
+- [Send errors to both a log aggregator and an error aggregator]({{<ref "#send-errors-to-both-a-log-aggregator-and-an-error-aggregator">}}).
+- [Don't send errors to aggregators from local systems]({{<ref "#dont-send-errors-to-aggregators-from-local-systems">}}).
+- [Use appropriate log levels]({{<ref "#make-use-of-different-log-levels">}}) (e.g., error vs warning) to guide attention.
 
-### **Log exceptions at the highest level**
+### Log exceptions at the highest level
 
 Plan to log the majority of exceptions at the boundary of your application. Let exceptions bubble up naturally, and only log them once they reach a top-level handler.
 
@@ -212,7 +215,7 @@ Avoid logging exceptions that you plan to re-raise. This ensures clean control f
 
 If your code is intended to be embedded or reused (rather than run as a standalone app), be especially mindful about logging. In many cases, it's better to raise and let the caller decide how to handle it.
 
-### **Log errors once**
+### Log errors once
 
 Repeated logging of a single error event interferes with aggregation and inflates volume metrics. Duplicate logging is unfortunately very common. Logging exceptions at app boundaries is the best way to avoid this trap.
 
@@ -222,19 +225,19 @@ Use stable, descriptive exception class names that clearly indicate the nature o
 
 You can reuse error types across similar failure conditions, but be intentional. Each class should represent a distinct issue.
 
-### **Keep dynamic values out of error *fingerprints***
+### Keep dynamic values out of error *fingerprints*
 
 Avoid embedding dynamic values (e.g., IDs, paths, or inputs) into the error message itself. These break fingerprinting and can scatter identical issues across many groups in your aggregator.
 
 Instead, attach dynamic values as structured fields, so they remain queryable without interfering with grouping.
 
-### **Send errors to both a log aggregator and an error aggregator**
+### Send errors to both a log aggregator and an error aggregator
 
 Error aggregators like Sentry make errors actionable: they show trends, alert your team, and surface contextual details. But errors are still logs. They need to be present in your log aggregator so that full traces and workflows can be reconstructed. 
 
 Make sure your system sends errors to both.
 
-### **Don't send errors to aggregators from local systems**
+### Don't send errors to aggregators from local systems
 
 Errors raised in local development or Jupyter notebooks can pollute your error aggregator with noise. These environments often trigger edge cases or incomplete setups that aren't production-relevant. By default, prevent error reporting from local environments. 
 
@@ -248,3 +251,5 @@ As a general rule of thumb:
 - **Warning**: Use for non-breaking issues that the system can recover from or tolerate. Warnings are still useful to track—especially if you want to monitor their frequency or catch early signs of degradation.
 
 Consistent use of log levels improves both local debugging and integration with alerting systems.
+
+→ *Join me in the [final post]({{< ref "logging-errors-in-python">}}) for a discussion of how to log errors effectively in Python*
