@@ -1,7 +1,11 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://kaplanalex.github.io/blog/'
 languageCode = 'en-us'
 title = 'My New Hugo Site'
 theme = "PaperMod"
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
 
 [taxonomies]
   series = 'series'
