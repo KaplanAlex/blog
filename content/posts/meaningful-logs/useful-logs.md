@@ -48,7 +48,7 @@ If you have ever owned an application which wrote directly to a log file on a ma
 
 These systems are most useful when the ingested logs are ***structured*** meaning they contain key-value pairs which can be used to index messages. It's also generally useful to include ***metadata*** (e.g. `environment`, `session_id`) within logs to facilitate searches and the construction of dashboards based on log content.
 
-The {{< ref "structured-log-primer" >}} will cover structured logging in detail.
+A [future article]({{< ref "structured-log-primer" >}}) will cover structured logging in detail.
 
 ### Useful practices
 
