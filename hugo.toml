@@ -1,4 +1,4 @@
-baseURL = 'https://kaplanalex.github.io/blog/'
+baseURL = 'https://kaplanalex.com'
 languageCode = 'en-us'
 title = "Alex's blog"
 theme = "PaperMod"
