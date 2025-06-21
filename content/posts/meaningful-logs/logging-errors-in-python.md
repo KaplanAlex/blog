@@ -285,26 +285,26 @@ class LogConfig(BaseSettings):
     Logging configuration
     """
 
-		def _build_structlog_processors(self) -> list[Processor]:
-		    processors = [
-		        structlog.contextvars.merge_contextvars,
-		        structlog.processors.add_log_level,
-		        process_custom_exceptions,
-		        # Other processors...
-		    ]
-		
-        # Forward logs of priority "event_level" or higher to sentry.
-        # Must come after "add_log_level" and "process_custom_exceptions".
-        # Adds all structured fields as sentry tags and event data.
-		    if self.sentry_enabled:
-		        processors.append(
-		            SentryProcessor(
-		                event_level=as_logging_level(self.sentry_log_level),
-		                tag_keys="__all__"  # Include all structured fields as Sentry tags
-		            )
-		        )
-		
-		    return processors
+    def _build_structlog_processors(self) -> list[Processor]:
+        processors = [
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            process_custom_exceptions,
+            # Other processors...
+        ]
+
+    # Forward logs of priority "event_level" or higher to sentry.
+    # Must come after "add_log_level" and "process_custom_exceptions".
+    # Adds all structured fields as sentry tags and event data.
+        if self.sentry_enabled:
+            processors.append(
+                SentryProcessor(
+                    event_level=as_logging_level(self.sentry_log_level),
+                    tag_keys="__all__"  # Include all structured fields as Sentry tags
+                )
+            )
+
+        return processors
 ```
 
 ### Update 3: Initialize the Sentry SDK.
@@ -320,25 +320,25 @@ class LogConfig(BaseSettings):
     Logging configuration
     """
 
-		def get_logger(self) -> structlog.stdlib.BoundLogger:
-        """
-        Fetch a new logger configured based on the current class state.
-        """
-        structlog.configure(
-            # ...existing configuration
+    def get_logger(self) -> structlog.stdlib.BoundLogger:
+    """
+    Fetch a new logger configured based on the current class state.
+    """
+    structlog.configure(
+        # ...existing configuration
+    )
+
+    # UPDATE: Configure the sentry sdk when enabled. Provide your sentry project URL (DSN)
+    # and the custom before_send method which modifies the fingerprint.
+    if self.sentry_enabled:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            environment=config.env,
+            before_send=before_send, # custom grouping logic
         )
 
-        # UPDATE: Configure the sentry sdk when enabled. Provide your sentry project URL (DSN)
-        # and the custom before_send method which modifies the fingerprint.
-        if self.sentry_enabled:
-		        sentry_sdk.init(
-			        dsn=SENTRY_DSN,
-			        environment=config.env,
-			        before_send=before_send, # custom grouping logic
-				    )
-        
-        # Use structlog.stdlib.get_logger used type hinting
-				return structlog.stdlib.get_logger(package).bind()
+    # Use structlog.stdlib.get_logger used type hinting
+    return structlog.stdlib.get_logger(package).bind()
 ```
 
 ### Update 4: Implement `before_send`
