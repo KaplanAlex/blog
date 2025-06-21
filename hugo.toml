@@ -3,6 +3,11 @@ languageCode = 'en-us'
 title = "Alex's blog"
 theme = "PaperMod"
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
 [caches]
   [caches.images]
     dir = ':cacheDir/images'
@@ -35,3 +40,8 @@ theme = "PaperMod"
   name = "Tags"
   url = "/tags/"
   weight = 3
+
+[[menu.main]]
+  name = "Newsletter"
+  url = "/newsletter/"
+  weight = 4
