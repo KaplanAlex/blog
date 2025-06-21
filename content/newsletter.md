@@ -1,14 +1,9 @@
 +++
 title = "Newsletter"
 date = "2025-06-20"
-description = "Subscribe to get the latest posts and thoughts on impact and engineering"
 showDate = false
 showReadingTime = false
 +++
-
-# Newsletter
-
-Stay updated with my latest thoughts
 
 <style>
 .newsletter-form {
@@ -89,11 +84,12 @@ Stay updated with my latest thoughts
   onsubmit="window.open('https://buttondown.com/kaplan', 'popupwindow')"
   class="newsletter-form"
 >
-  <label for="bd-email">Enter your email</label>
+  <label for="bd-email">Stay up to date with my latest thoughts</label>
   <input 
     type="email" 
     name="email" 
     id="bd-email" 
+    placeholder="example@example.com"
     required
   />
   
